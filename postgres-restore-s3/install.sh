@@ -10,7 +10,7 @@ apk add postgresql
 apk add postgresql-jit
 
 # install s3 tools
-apk add python3 py3-pip
+apk add python3 py3-pip py3-six
 pip install awscli
 apk del py3-pip
 
