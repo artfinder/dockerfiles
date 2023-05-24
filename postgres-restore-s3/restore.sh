@@ -57,17 +57,15 @@ LATEST_BACKUP=$(aws s3 ls s3://$S3_BUCKET/$S3_PREFIX/ | sort | tail -n 1 | awk '
 
 echo "Fetching ${LATEST_BACKUP} from S3"
 
-aws s3 cp s3://$S3_BUCKET/$S3_PREFIX/${LATEST_BACKUP} dump.sql.gz
-gzip -d dump.sql.gz
+aws s3 cp s3://$S3_BUCKET/$S3_PREFIX/${LATEST_BACKUP} db.dump
 
-if [ "${DROP_PUBLIC}" == "yes" ]; then
-	echo "Recreating the public schema"
-	psql $POSTGRES_HOST_OPTS -d $POSTGRES_DATABASE -c "drop schema public cascade; create schema public;"
-fi
+
+echo "Deleting existing database ${POSTGRES_DATABASE}"
+dropdb $POSTGRES_DATABASE
+createdb -T template0 $POSTGRES_DATABASE
 
 echo "Restoring ${LATEST_BACKUP}"
-
-psql $POSTGRES_HOST_OPTS -d $POSTGRES_DATABASE < dump.sql
+pg_restore $POSTGRES_HOST_OPTS -d $POSTGRES_DATABASE db.dump
 
 echo "Restore complete"
 
