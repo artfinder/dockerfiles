@@ -61,8 +61,8 @@ aws s3 cp s3://$S3_BUCKET/$S3_PREFIX/${LATEST_BACKUP} db.dump
 
 
 echo "Deleting existing database ${POSTGRES_DATABASE}"
-dropdb $POSTGRES_DATABASE
-createdb -T template0 $POSTGRES_DATABASE
+dropdb $POSTGRES_HOST_OPTS $POSTGRES_DATABASE
+createdb $POSTGRES_HOST_OPTS -T template0 $POSTGRES_DATABASE
 
 echo "Restoring ${LATEST_BACKUP}"
 pg_restore $POSTGRES_HOST_OPTS -d $POSTGRES_DATABASE db.dump
