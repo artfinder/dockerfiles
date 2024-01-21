@@ -49,6 +49,13 @@ else
   AWS_ARGS="--endpoint-url ${S3_ENDPOINT}"
 fi
 
+
+if [ "${S3_EXPECTED_SIZE}" == "**None**" ]; then
+  S3_SIZE=10000000000
+else
+  S3_SIZE=${S3_EXPECTED_SIZE}
+fi
+
 # env vars needed for aws tools
 export AWS_ACCESS_KEY_ID=$S3_ACCESS_KEY_ID
 export AWS_SECRET_ACCESS_KEY=$S3_SECRET_ACCESS_KEY
@@ -63,6 +70,6 @@ pg_dump $POSTGRES_HOST_OPTS -Fc $POSTGRES_DATABASE > db.dump
 
 echo "Uploading dump to $S3_BUCKET"
 
-cat db.dump | aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_$(date +"%Y-%m-%dT%H:%M:%SZ").dump || exit 2
+cat db.dump | aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_$(date +"%Y-%m-%dT%H:%M:%SZ").dump --expected-size $S3_SIZE || exit 2
 
 echo "SQL backup uploaded successfully"
