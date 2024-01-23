@@ -57,15 +57,14 @@ LATEST_BACKUP=$(aws s3 ls s3://$S3_BUCKET/$S3_PREFIX/ | sort | tail -n 1 | awk '
 
 echo "Fetching ${LATEST_BACKUP} from S3"
 
-aws s3 cp s3://$S3_BUCKET/$S3_PREFIX/${LATEST_BACKUP} db.dump
-
+aws s3 cp s3://$S3_BUCKET/$S3_PREFIX/${LATEST_BACKUP} db.sql.gz
 
 echo "Deleting existing database ${POSTGRES_DATABASE}"
 dropdb $POSTGRES_HOST_OPTS $POSTGRES_DATABASE
 createdb $POSTGRES_HOST_OPTS -T template0 $POSTGRES_DATABASE
 
 echo "Restoring ${LATEST_BACKUP}"
-pg_restore $POSTGRES_HOST_OPTS -d $POSTGRES_DATABASE db.dump
+pg_restore $POSTGRES_HOST_OPTS -d $POSTGRES_DATABASE db.sql.gz
 
 echo "Restore complete"
 
