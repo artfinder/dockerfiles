@@ -68,7 +68,7 @@ echo "Creating dump of ${POSTGRES_DATABASE} database from ${POSTGRES_HOST}..."
 
 pg_dump $POSTGRES_HOST_OPTS -Fc $POSTGRES_DATABASE > db.sql.gz
 
-echo "Uploading dump to $S3_BUCKET using expected size $S3_SIZE..."
+echo "Uploading dump with command aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_$(date +"%Y-%m-%dT%H:%M:%SZ").sql.gz --expected-size $S3_SIZE"
 
 cat db.sql.gz | aws configure set default.s3.multipart_chunksize 100MB | aws $AWS_ARGS s3 cp - s3://$S3_BUCKET/$S3_PREFIX/${POSTGRES_DATABASE}_$(date +"%Y-%m-%dT%H:%M:%SZ").sql.gz --expected-size $S3_SIZE || exit 2
 
